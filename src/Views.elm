@@ -1,5 +1,6 @@
 module Views exposing (view)
 
+import Date
 import Html exposing (..)
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
@@ -26,7 +27,14 @@ header model =
         dateText =
             Strftime.format "%Y-%m-%d" model.date
     in
-        h1 [] [ "Toggl Summary for " ++ dateText |> text ]
+        div []
+            [ h1 [] [ "Toggl Summary for " ++ dateText |> text ]
+            , h2 []
+                [ "Have been working for "
+                    ++ (durationOfEntireDay model.togglEntries |> millisecondsAsTimeStamp)
+                    |> text
+                ]
+            ]
 
 
 viewErrorMessage : Model -> Html Msg
@@ -57,11 +65,11 @@ mainView model =
             h2 [] [ text "Loading ..." ]
 
         Loaded ->
-            viewLoaded model.rows
+            viewLoaded model
 
 
-viewLoaded : List SummaryRow -> Html Msg
-viewLoaded rows =
+viewLoaded : Model -> Html Msg
+viewLoaded model =
     let
         header =
             [ "Jira", "Title", "Time tracked in Toggl", "", "Hours", "", "Done" ]
@@ -93,16 +101,16 @@ viewLoaded rows =
                     ]
 
         summary =
-            rows
+            model.rows
                 |> List.map .halfHours
                 |> List.sum
                 |> viewHalfHoursAsDecimalNumber
-                |> \totalHalfHours -> h3 [] [ "Total: " ++ totalHalfHours |> text ]
+                |> \totalHalfHours -> h3 [] [ "Total: " ++ totalHalfHours ++ " hours" |> text ]
     in
         div []
             [ table []
                 (header
-                    :: (rows
+                    :: (model.rows
                             |> List.sortBy .totalDurationInMilliseconds
                             |> List.reverse
                             |> List.map viewRow
@@ -110,6 +118,29 @@ viewLoaded rows =
                 )
             , summary
             ]
+
+
+durationOfEntireDay : List TogglEntry -> Int
+durationOfEntireDay togglEntries =
+    let
+        startTime =
+            togglEntries
+                |> List.map .start
+                |> List.map Date.toTime
+                |> List.sort
+                |> List.head
+                |> Maybe.withDefault 0
+
+        stopTime =
+            togglEntries
+                |> List.map .end
+                |> List.map Date.toTime
+                |> List.sort
+                |> List.reverse
+                |> List.head
+                |> Maybe.withDefault 0
+    in
+        stopTime - startTime |> round
 
 
 viewHalfHoursAsDecimalNumber : Int -> String
