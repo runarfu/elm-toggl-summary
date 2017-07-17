@@ -1,0 +1,21 @@
+{
+    "version": "1.0.0",
+    "summary": "Summarize your working hours using the Toggl API.",
+    "repository": "http://github.com/runarfu/elm-toggl-summary.git",
+    "license": "GNU GPL",
+    "source-directories": [
+        "src"
+    ],
+    "exposed-modules": [],
+    "dependencies": {
+        "Bogdanp/elm-querystring": "1.0.0 <= v < 2.0.0",
+        "NoRedInk/elm-decode-pipeline": "3.0.0 <= v < 4.0.0",
+        "elm-lang/core": "5.1.1 <= v < 6.0.0",
+        "elm-lang/html": "2.0.0 <= v < 3.0.0",
+        "elm-lang/http": "1.0.0 <= v < 2.0.0",
+        "rluiten/elm-date-extra": "9.0.1 <= v < 10.0.0",
+        "thaterikperson/elm-strftime": "1.0.4 <= v < 2.0.0",
+        "truqu/elm-base64": "2.0.0 <= v < 3.0.0"
+    },
+    "elm-version": "0.18.0 <= v < 0.19.0"
+}
