@@ -1,18 +1,17 @@
-module Toggl exposing (getTogglEntries, collapseSameThings)
+module Toggl exposing (getTogglEntriesRequest)
 
 import Date exposing (Date)
 import Base64
 import Json.Decode as Decode
 import Strftime
 import Http
-import Set
 import QueryString exposing (add)
 import Types exposing (..)
 import Config exposing (myTogglCredentials)
 
 
-getTogglEntries : Date -> Cmd Msg
-getTogglEntries date =
+getTogglEntriesRequest : Date -> Http.Request (List TogglEntry)
+getTogglEntriesRequest date =
     let
         dateString =
             Strftime.format "%Y-%m-%d" date
@@ -24,21 +23,18 @@ getTogglEntries date =
                 |> add "since" dateString
                 |> add "until" dateString
                 |> QueryString.render
-
-        request =
-            Http.request
-                { method = "GET"
-                , headers =
-                    [ basicAuthHeader myTogglCredentials.apiToken "api_token" ]
-                , url =
-                    "https://toggl.com/reports/api/v2/details/" ++ query
-                , body = Http.emptyBody
-                , expect = Http.expectJson entries
-                , timeout = Nothing
-                , withCredentials = False
-                }
     in
-        Http.send Types.HttpResultat request
+        Http.request
+            { method = "GET"
+            , headers =
+                [ basicAuthHeader myTogglCredentials.apiToken "api_token" ]
+            , url =
+                "https://toggl.com/reports/api/v2/details/" ++ query
+            , body = Http.emptyBody
+            , expect = Http.expectJson entries
+            , timeout = Nothing
+            , withCredentials = False
+            }
 
 
 basicAuthHeader : String -> String -> Http.Header
@@ -53,30 +49,30 @@ basicAuthHeader username password =
         Http.header "Authorization" ("Basic " ++ base64EncodedValue)
 
 
+date : Decode.Decoder Date
+date =
+    let
+        convert : String -> Decode.Decoder Date
+        convert raw =
+            case Date.fromString raw of
+                Ok date ->
+                    Decode.succeed date
+
+                Err error ->
+                    Decode.fail error
+    in
+        Decode.string |> Decode.andThen convert
+
+
 entry : Decode.Decoder TogglEntry
 entry =
-    Decode.map2 TogglEntry
+    Decode.map4 TogglEntry
         (Decode.field "dur" Decode.int)
         (Decode.field "description" Decode.string)
+        (Decode.field "start" date)
+        (Decode.field "end" date)
 
 
 entries : Decode.Decoder (List TogglEntry)
 entries =
     Decode.field "data" (Decode.list entry)
-
-
-collapseSameThings : List TogglEntry -> List TogglEntry
-collapseSameThings togglEntries =
-    let
-        allOfTitle title =
-            togglEntries
-                |> List.filter ((==) title << .title)
-                |> List.map .time
-                |> List.sum
-                |> \time -> { time = time, title = title }
-    in
-        togglEntries
-            |> List.map .title
-            |> Set.fromList
-            |> Set.toList
-            |> List.map allOfTitle

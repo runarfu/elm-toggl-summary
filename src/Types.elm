@@ -6,32 +6,41 @@ import Date exposing (Date)
 
 
 type alias Model =
-    { status : Status
-    , entries : List Entry
+    { state : State
+    , togglEntries : List TogglEntry
+    , rows : List SummaryRow
     , date : Date
-    , errorMessage : Maybe String
+    , errors : Errors
     }
 
 
-type Status
+type alias RowId =
+    Int
+
+
+type Errors
+    = NoErrors
+    | Errors (List String)
+
+
+type State
     = NotLoaded
     | Loaded
 
 
-type alias Id =
-    Int
-
-
-type alias Entry =
-    { id : Id
-    , togglEntry : TogglEntry
+type alias SummaryRow =
+    { rowId : RowId
+    , title : String
+    , totalDurationInMilliseconds : Int
     , halfHours : Int
     }
 
 
 type alias TogglEntry =
-    { time : Int
+    { durationInMilliseconds : Int
     , title : String
+    , start : Date
+    , end : Date
     }
 
 
@@ -44,7 +53,7 @@ type alias TogglCredentials =
 
 type Msg
     = NewTime Time
-    | AddHalfHour Id
-    | SubtractHalfHour Id
+    | HttpResponse (Result Http.Error (List TogglEntry))
+    | AddHalfHour RowId
+    | SubtractHalfHour RowId
     | AddDays Int
-    | HttpResultat (Result Http.Error (List TogglEntry))

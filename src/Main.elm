@@ -26,8 +26,9 @@ getCurrentTime =
 
 initModel : Model
 initModel =
-    { status = Types.NotLoaded
-    , entries = []
+    { state = Types.NotLoaded
+    , togglEntries = []
+    , rows = []
     , date = Date.fromTime 0
-    , errorMessage = Nothing
+    , errors = Types.NoErrors
     }

@@ -31,12 +31,15 @@ header model =
 
 viewErrorMessage : Model -> Html Msg
 viewErrorMessage model =
-    case model.errorMessage of
-        Just error ->
-            p [ style [ ( "color", "red" ) ] ] [ "Oh no! " ++ error |> text ]
+    case model.errors of
+        Errors errors ->
+            div [ style [ ( "color", "red" ) ] ]
+                [ h2 [] [ text "Errors:" ]
+                , p [] [ String.join ", " errors |> text ]
+                ]
 
-        Nothing ->
-            p [] []
+        NoErrors ->
+            span [] []
 
 
 dayNavigation : Html Msg
@@ -49,89 +52,69 @@ dayNavigation =
 
 mainView : Model -> Html Msg
 mainView model =
-    case model.status of
+    case model.state of
         NotLoaded ->
-            p [] [ text "Loading…" ]
+            h2 [] [ text "Loading ..." ]
 
         Loaded ->
-            viewLastet model.entries
+            viewLoaded model.rows
 
 
-viewLastet : List Entry -> Html Msg
-viewLastet model =
+viewLoaded : List SummaryRow -> Html Msg
+viewLoaded rows =
     let
         header =
-            [ "Jira", "Title", "Time tracked in Toggl", "", "Hours to bill", "", "Done billing" ]
+            [ "Jira", "Title", "Time tracked in Toggl", "", "Hours", "", "Done" ]
                 |> List.map (\h -> th [] [ text h ])
                 |> tr []
+
+        viewRow row =
+            let
+                ( jira, title ) =
+                    splitTitle row.title
+
+                hasHalfHours =
+                    row.halfHours > 0
+
+                rowColor =
+                    if hasHalfHours then
+                        "lightgrey"
+                    else
+                        "white"
+            in
+                tr [ style [ ( "background-color", rowColor ) ] ]
+                    [ td [] [ makeLinkIfStartOfTitleLooksLikeJiraIdentifier jira ]
+                    , td [] [ text title ]
+                    , td [] [ text (millisecondsAsTimeStamp row.totalDurationInMilliseconds) ]
+                    , td [] [ button [ onClick (SubtractHalfHour row.rowId) ] [ text "-" ] ]
+                    , td [] [ text <| viewHalfHoursAsDecimalNumber row.halfHours ]
+                    , td [] [ button [ onClick (AddHalfHour row.rowId) ] [ text "+" ] ]
+                    , td [] [ input [ type_ "checkbox" ] [] ]
+                    ]
+
+        summary =
+            rows
+                |> List.map .halfHours
+                |> List.sum
+                |> viewHalfHoursAsDecimalNumber
+                |> \totalHalfHours -> h3 [] [ "Total: " ++ totalHalfHours |> text ]
     in
-        table []
-            (header
-                :: List.map
-                    (\e ->
-                        let
-                            ( jira, title ) =
-                                splitTitle e.togglEntry.title
-
-                            hasHalfHours =
-                                e.halfHours > 0
-
-                            rowColor =
-                                if hasHalfHours then
-                                    "lightgrey"
-                                else
-                                    "white"
-                        in
-                            tr [ style [ ( "background-color", rowColor ) ] ]
-                                [ td [] [ makeLinkIfStartOfTitleLooksLikeJiraIdentifier jira ]
-                                , td [] [ text title ]
-                                , td [] [ text (millisecondsAsTimeStamp e.togglEntry.time) ]
-                                , td [] [ minus e.id ]
-                                , td []
-                                    [ e.halfHours
-                                        |> toFloat
-                                        |> (\f -> f / 2)
-                                        |> toString
-                                        |> text
-                                    ]
-                                  --text (millisecondsAsTimeStamp (e.halfHours * 1800000)) ]
-                                , td [] [ plus e.id ]
-                                , td [] [ input [ type_ "checkbox" ] [] ]
-                                ]
-                    )
-                    (List.reverse
-                        (List.sortBy (.time << .togglEntry) model)
-                    )
-                ++ [ tr []
-                        [ td [] [ b [] [ text "SUM" ] ]
-                        , td [] [ text "" ]
-                        , td [] [ text "" ]
-                        , td [] [ text "" ]
-                        , td []
-                            [ b []
-                                [ model
-                                    |> List.map .halfHours
-                                    |> List.sum
-                                    |> toFloat
-                                    |> (\f -> f / 2)
-                                    |> toString
-                                    |> text
-                                ]
-                            ]
-                          --text (millisecondsAsTimeStamp (1800000 * List.sum (List.map .halfHours model))) ] ]
-                        ]
-                   ]
-            )
+        div []
+            [ table []
+                (header
+                    :: (rows
+                            |> List.sortBy .totalDurationInMilliseconds
+                            |> List.reverse
+                            |> List.map viewRow
+                       )
+                )
+            , summary
+            ]
 
 
-plus : Id -> Html Msg
-plus id =
-    button [ onClick (AddHalfHour id) ] [ text "+" ]
-
-
-minus : Id -> Html Msg
-minus id =
-    button [ onClick (SubtractHalfHour id) ] [ text "-" ]
+viewHalfHoursAsDecimalNumber : Int -> String
+viewHalfHoursAsDecimalNumber halfHours =
+    toString <| (toFloat halfHours) / 2
 
 
 makeLinkIfStartOfTitleLooksLikeJiraIdentifier : String -> Html Msg
