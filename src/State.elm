@@ -4,7 +4,6 @@ import Date exposing (Date)
 import Http
 import Date.Extra.Period exposing (add)
 import Set
-import Time
 import Types exposing (..)
 import Toggl exposing (..)
 
