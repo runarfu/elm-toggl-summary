@@ -4,6 +4,7 @@ import Date exposing (Date)
 import Http
 import Date.Extra.Period exposing (add)
 import Set
+import Time
 import Types exposing (..)
 import Toggl exposing (..)
 
@@ -84,11 +85,24 @@ collapseEntriesWithSameTitle togglEntries =
                         { rowId = index
                         , title = title
                         , totalDurationInMilliseconds = totalDurationInMilliseconds
-                        , halfHours = roundMillisecondsToHalfHours totalDurationInMilliseconds
+                        , halfHours = roundMillisecondsToNearestHalfHours totalDurationInMilliseconds
                         }
             )
 
 
-roundMillisecondsToHalfHours : Int -> Int
-roundMillisecondsToHalfHours ms =
-    ms // 1800000
+roundMillisecondsToNearestHalfHours : Int -> Int
+roundMillisecondsToNearestHalfHours ms =
+    let
+        halfHours =
+            (toFloat ms) / 1800000
+
+        upperLimit =
+            ceiling halfHours
+
+        lowerLimit =
+            floor halfHours
+    in
+        if ((toFloat upperLimit) - halfHours < halfHours - (toFloat lowerLimit)) then
+            upperLimit
+        else
+            lowerLimit
