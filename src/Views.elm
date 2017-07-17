@@ -61,7 +61,7 @@ viewLastet : List Entry -> Html Msg
 viewLastet model =
     let
         header =
-            [ "Jira", "Title", "Time tracked in Toggl", "", "Time to bill", "", "Done billing" ]
+            [ "Jira", "Title", "Time tracked in Toggl", "", "Hours to bill", "", "Done billing" ]
                 |> List.map (\h -> th [] [ text h ])
                 |> tr []
     in
@@ -86,9 +86,16 @@ viewLastet model =
                                 [ td [] [ makeLinkIfStartOfTitleLooksLikeJiraIdentifier jira ]
                                 , td [] [ text title ]
                                 , td [] [ text (millisecondsAsTimeStamp e.togglEntry.time) ]
-                                , td [] [ plus e.id ]
-                                , td [] [ text (millisecondsAsTimeStamp (e.halfHours * 1800000)) ]
                                 , td [] [ minus e.id ]
+                                , td []
+                                    [ e.halfHours
+                                        |> toFloat
+                                        |> (\f -> f / 2)
+                                        |> toString
+                                        |> text
+                                    ]
+                                  --text (millisecondsAsTimeStamp (e.halfHours * 1800000)) ]
+                                , td [] [ plus e.id ]
                                 , td [] [ input [ type_ "checkbox" ] [] ]
                                 ]
                     )
@@ -100,7 +107,18 @@ viewLastet model =
                         , td [] [ text "" ]
                         , td [] [ text "" ]
                         , td [] [ text "" ]
-                        , td [] [ b [] [ text (millisecondsAsTimeStamp (1800000 * List.sum (List.map .halfHours model))) ] ]
+                        , td []
+                            [ b []
+                                [ model
+                                    |> List.map .halfHours
+                                    |> List.sum
+                                    |> toFloat
+                                    |> (\f -> f / 2)
+                                    |> toString
+                                    |> text
+                                ]
+                            ]
+                          --text (millisecondsAsTimeStamp (1800000 * List.sum (List.map .halfHours model))) ] ]
                         ]
                    ]
             )
