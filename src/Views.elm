@@ -72,7 +72,7 @@ viewLoaded : Model -> Html Msg
 viewLoaded model =
     let
         header =
-            [ "Jira", "Title", "Time tracked in Toggl", "", "Hours", "", "Done" ]
+            [ "JIRA", "", "Description", "Time tracked in Toggl", "", "Hours", "", "Done" ]
                 |> List.map (\h -> th [] [ text h ])
                 |> tr []
 
@@ -84,6 +84,9 @@ viewLoaded model =
                 hasHalfHours =
                     row.halfHours > 0
 
+                clipboardId =
+                    "copy-" ++ (toString row.rowId)
+
                 rowColor =
                     if hasHalfHours then
                         "lightgrey"
@@ -91,7 +94,17 @@ viewLoaded model =
                         "white"
             in
                 tr [ style [ ( "background-color", rowColor ) ] ]
-                    [ td [] [ makeLinkIfStartOfTitleLooksLikeJiraIdentifier jira ]
+                    [ button
+                        [ class "copy-button"
+                        , attribute "data-clipboard-target" ("#" ++ clipboardId)
+                        , id clipboardId
+                        , "Copy '"
+                            ++ jira
+                            ++ "' to clipboard'"
+                            |> Html.Attributes.title
+                        ]
+                        [ text jira ]
+                    , td [] [ makeLinkIfStartOfTitleLooksLikeJiraIdentifier jira ]
                     , td [] [ text title ]
                     , td [] [ text (millisecondsAsTimeStamp row.totalDurationInMilliseconds) ]
                     , td [] [ button [ onClick (SubtractHalfHour row.rowId) ] [ text "-" ] ]
@@ -161,10 +174,10 @@ makeLinkIfStartOfTitleLooksLikeJiraIdentifier title =
                 |> List.head
         of
             Just jiranumber ->
-                a [ href (jiraUrl ++ jiranumber) ] [ text jiranumber ]
+                a [ href (jiraUrl ++ jiranumber) ] [ text "🔗" ]
 
             Nothing ->
-                text title
+                span [] []
 
 
 splitTitle : String -> ( String, String )
