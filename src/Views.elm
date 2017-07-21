@@ -76,24 +76,21 @@ viewLoaded model =
                 |> List.map (\h -> th [] [ text h ])
                 |> tr []
 
-        viewRow row =
+        viewRow index row =
             let
                 ( jira, title ) =
                     splitTitle row.title
 
-                hasHalfHours =
-                    row.halfHours > 0
-
                 clipboardId =
                     "copy-" ++ (toString row.rowId)
 
-                rowColor =
-                    if hasHalfHours then
-                        "lightgrey"
+                rowClass =
+                    if index % 2 == 0 then
+                        ""
                     else
-                        "white"
+                        "pure-table-odd"
             in
-                tr [ style [ ( "background-color", rowColor ) ] ]
+                tr [ class rowClass ]
                     [ button
                         [ class "copy-button pure-button"
                         , attribute "data-clipboard-target" ("#" ++ clipboardId)
@@ -126,7 +123,7 @@ viewLoaded model =
                     :: (model.rows
                             |> List.sortBy .totalDurationInMilliseconds
                             |> List.reverse
-                            |> List.map viewRow
+                            |> List.indexedMap viewRow
                        )
                 )
             , summary
