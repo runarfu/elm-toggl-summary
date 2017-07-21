@@ -91,17 +91,8 @@ viewLoaded model =
                         "pure-table-odd"
             in
                 tr [ class rowClass ]
-                    [ button
-                        [ class "copy-button pure-button"
-                        , attribute "data-clipboard-target" ("#" ++ clipboardId)
-                        , id clipboardId
-                        , "Copy '"
-                            ++ jira
-                            ++ "' to clipboard'"
-                            |> Html.Attributes.title
-                        ]
-                        [ text jira ]
-                    , td [] [ makeLinkIfStartOfTitleLooksLikeJiraIdentifier jira ]
+                    [ td [ id clipboardId ] [ makeLinkIfStartOfTitleLooksLikeJiraIdentifier jira ]
+                    , td [] [ copyJiraReferenceButton clipboardId ]
                     , td [] [ text title ]
                     , td [] [ text (millisecondsAsTimeStamp row.totalDurationInMilliseconds) ]
                     , td [] [ button [ class "pure-button", onClick (SubtractHalfHour row.rowId) ] [ text "-" ] ]
@@ -129,6 +120,16 @@ viewLoaded model =
                 ]
             , summary
             ]
+
+
+copyJiraReferenceButton : String -> Html msg
+copyJiraReferenceButton clipboardId =
+    div
+        [ class "copy-button"
+        , attribute "data-clipboard-target" ("#" ++ clipboardId)
+        , title "Copy JIRA reference to clipboard"
+        ]
+        [ text "📋" ]
 
 
 durationOfEntireDay : List TogglEntry -> Int
@@ -172,7 +173,7 @@ makeLinkIfStartOfTitleLooksLikeJiraIdentifier title =
                 |> List.head
         of
             Just jiranumber ->
-                a [ href (jiraUrl ++ jiranumber) ] [ text "🔗" ]
+                a [ href (jiraUrl ++ jiranumber) ] [ text jiranumber ]
 
             Nothing ->
                 span [] []
