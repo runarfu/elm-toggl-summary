@@ -52,9 +52,9 @@ viewErrorMessage model =
 
 dayNavigation : Html Msg
 dayNavigation =
-    p []
-        [ button [ onClick (AddDays -1) ] [ text "Previous day" ]
-        , button [ onClick (AddDays 1) ] [ text "Next day" ]
+    p [ class "pure-button-group", attribute "role" "group" ]
+        [ button [ class "pure-button", onClick (AddDays -1) ] [ text "Previous day" ]
+        , button [ class "pure-button", onClick (AddDays 1) ] [ text "Next day" ]
         ]
 
 
@@ -95,7 +95,7 @@ viewLoaded model =
             in
                 tr [ style [ ( "background-color", rowColor ) ] ]
                     [ button
-                        [ class "copy-button"
+                        [ class "copy-button pure-button"
                         , attribute "data-clipboard-target" ("#" ++ clipboardId)
                         , id clipboardId
                         , "Copy '"
@@ -107,9 +107,9 @@ viewLoaded model =
                     , td [] [ makeLinkIfStartOfTitleLooksLikeJiraIdentifier jira ]
                     , td [] [ text title ]
                     , td [] [ text (millisecondsAsTimeStamp row.totalDurationInMilliseconds) ]
-                    , td [] [ button [ onClick (SubtractHalfHour row.rowId) ] [ text "-" ] ]
+                    , td [] [ button [ class "pure-button", onClick (SubtractHalfHour row.rowId) ] [ text "-" ] ]
                     , td [] [ text <| viewHalfHoursAsDecimalNumber row.halfHours ]
-                    , td [] [ button [ onClick (AddHalfHour row.rowId) ] [ text "+" ] ]
+                    , td [] [ button [ class "pure-button", onClick (AddHalfHour row.rowId) ] [ text "+" ] ]
                     , td [] [ input [ type_ "checkbox" ] [] ]
                     ]
 
@@ -121,7 +121,7 @@ viewLoaded model =
                 |> \totalHalfHours -> h3 [] [ "Total: " ++ totalHalfHours ++ " hours" |> text ]
     in
         div []
-            [ table []
+            [ table [ class "pure-table" ]
                 (header
                     :: (model.rows
                             |> List.sortBy .totalDurationInMilliseconds
