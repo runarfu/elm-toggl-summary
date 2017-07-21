@@ -101,12 +101,22 @@ viewLoaded model =
                     , td [] [ input [ type_ "checkbox" ] [] ]
                     ]
 
-        summary =
+        footer =
             model.rows
                 |> List.map .halfHours
                 |> List.sum
                 |> viewHalfHoursAsDecimalNumber
-                |> \totalHalfHours -> h3 [] [ "Total: " ++ totalHalfHours ++ " hours" |> text ]
+                |> \totalHalfHours ->
+                    tr []
+                        [ td [] []
+                        , td [] []
+                        , td [] []
+                        , td [] []
+                        , td [] []
+                        , td [] [ text totalHalfHours ]
+                        , td [] []
+                        , td [] []
+                        ]
     in
         div []
             [ table [ class "pure-table" ]
@@ -117,8 +127,8 @@ viewLoaded model =
                         |> List.reverse
                         |> List.indexedMap viewRow
                     )
+                , tfoot [ style [ ( "font-weight", "bold" ) ] ] [ footer ]
                 ]
-            , summary
             ]
 
 
