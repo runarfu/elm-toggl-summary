@@ -95,9 +95,23 @@ viewLoaded model =
                     , td [] [ copyJiraReferenceButton clipboardId ]
                     , td [] [ text title ]
                     , td [] [ text (millisecondsAsTimeStamp row.totalDurationInMilliseconds) ]
-                    , td [] [ button [ class "pure-button", onClick (SubtractHalfHour row.rowId) ] [ text "-" ] ]
+                    , td []
+                        [ button
+                            [ class "pure-button"
+                            , onClick (SubtractHalfHour row.rowId)
+                            , Html.Attributes.title "Subtract half an hour"
+                            ]
+                            [ text "-" ]
+                        ]
                     , td [ style [ ( "text-align", "right" ) ] ] [ text <| viewHalfHoursAsDecimalNumber row.halfHours ]
-                    , td [] [ button [ class "pure-button", onClick (AddHalfHour row.rowId) ] [ text "+" ] ]
+                    , td []
+                        [ button
+                            [ class "pure-button"
+                            , onClick (AddHalfHour row.rowId)
+                            , Html.Attributes.title "Add half an hour"
+                            ]
+                            [ text "+" ]
+                        ]
                     , td [] [ input [ type_ "checkbox" ] [] ]
                     ]
 
