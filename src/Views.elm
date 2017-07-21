@@ -119,13 +119,14 @@ viewLoaded model =
     in
         div []
             [ table [ class "pure-table" ]
-                (header
-                    :: (model.rows
-                            |> List.sortBy .totalDurationInMilliseconds
-                            |> List.reverse
-                            |> List.indexedMap viewRow
-                       )
-                )
+                [ thead [] [ header ]
+                , tbody []
+                    (model.rows
+                        |> List.sortBy .totalDurationInMilliseconds
+                        |> List.reverse
+                        |> List.indexedMap viewRow
+                    )
+                ]
             , summary
             ]
 
