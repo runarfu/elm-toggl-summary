@@ -24,3 +24,10 @@ jiraUrl : String
 jiraUrl =
     "" -- The prefix of the Jira system you use (or leave it blank)
 ```
+
+# Install
+After creating `src/Config.elm`, compile the app like this:
+```
+$ elm make src/Main.elm --output=main.js
+```
+Then open `index.html` in a browser.
