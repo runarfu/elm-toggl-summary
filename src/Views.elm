@@ -186,7 +186,7 @@ makeLinkIfStartOfTitleLooksLikeJiraIdentifier title =
                 a [ href (jiraUrl ++ jiranumber) ] [ text jiranumber ]
 
             Nothing ->
-                span [] []
+                span [] [ text title ]
 
 
 splitTitle : String -> ( String, String )
