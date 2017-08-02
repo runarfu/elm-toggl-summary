@@ -13,6 +13,11 @@ a:hover { color: lightskyblue; }
 
 .copy-button { cursor: pointer; }
 
+.total-half-hours {
+  white-space: nowrap;
+  text-align: right;
+}
+
 
 /*** Extend PureCSS ***/
 /* Give table foot same look as table head */

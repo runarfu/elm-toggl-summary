@@ -122,27 +122,25 @@ viewLoaded model =
                 |> viewHalfHoursAsDecimalNumber
                 |> \totalHalfHours ->
                     tr []
-                        [ td [] []
-                        , td [] []
-                        , td [] []
-                        , td [] []
-                        , td [] []
-                        , td [ style [ ( "text-align", "right" ) ] ] [ "Total: " ++ totalHalfHours |> text ]
-                        , td [] []
-                        , td [] []
+                        [ th [] []
+                        , th [] []
+                        , th [] []
+                        , th [] []
+                        , th [] []
+                        , th [ class "total-half-hours" ] [ "Total: " ++ totalHalfHours |> text ]
+                        , th [] []
+                        , th [] []
                         ]
     in
-        div []
-            [ table [ class "pure-table" ]
-                [ thead [] [ header ]
-                , tbody []
-                    (model.rows
-                        |> List.sortBy .totalDurationInMilliseconds
-                        |> List.reverse
-                        |> List.indexedMap viewRow
-                    )
-                , tfoot [ style [ ( "font-weight", "bold" ) ] ] [ footer ]
-                ]
+        table [ class "pure-table" ]
+            [ thead [] [ header ]
+            , tbody []
+                (model.rows
+                    |> List.sortBy .totalDurationInMilliseconds
+                    |> List.reverse
+                    |> List.indexedMap viewRow
+                )
+            , tfoot [] [ footer ]
             ]
 
 
