@@ -1,0 +1,19 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1em;
+}
+
+a {
+  color: deepskyblue;
+  transition: color 0.2s ease-in-out;
+}
+a:hover { color: lightskyblue; }
+
+.copy-button { cursor: pointer; }
+
+
+/*** Extend PureCSS ***/
+/* Give table foot same look as table head */
+.pure-table tfoot { background-color: #e0e0e0; }

@@ -13,7 +13,7 @@ import Config exposing (jiraUrl)
 
 view : Model -> Html Msg
 view model =
-    div []
+    div [ class "main" ]
         [ header model
         , viewErrorMessage model
         , dayNavigation
