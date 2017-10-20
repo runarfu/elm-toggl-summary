@@ -34,6 +34,9 @@ update msg model =
         AddDays days ->
             addDaysAndSendNewRequest model days
 
+        ToggleIsDone rowId ->
+            { model | rows = toggleIsDone model.rows rowId } ! []
+
 
 setNewDateAndSendNewRequest : Model -> Date -> ( Model, Cmd Msg )
 setNewDateAndSendNewRequest model date =
@@ -68,6 +71,18 @@ changeDurationForId entries rowId delta =
             )
 
 
+toggleIsDone : List SummaryRow -> RowId -> List SummaryRow
+toggleIsDone entries rowId =
+    entries
+        |> List.map
+            (\entry ->
+                if entry.rowId == rowId then
+                    { entry | isDone = not entry.isDone }
+                else
+                    entry
+            )
+
+
 collapseEntriesWithSameTitle : List TogglEntry -> List SummaryRow
 collapseEntriesWithSameTitle togglEntries =
     togglEntries
@@ -85,6 +100,7 @@ collapseEntriesWithSameTitle togglEntries =
                         , title = title
                         , totalDurationInMilliseconds = totalDurationInMilliseconds
                         , halfHours = roundMillisecondsToNearestHalfHours totalDurationInMilliseconds
+                        , isDone = False
                         }
             )
 
