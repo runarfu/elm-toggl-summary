@@ -76,6 +76,11 @@ viewLoaded model =
                 |> List.map (\h -> th [] [ text h ])
                 |> tr []
 
+        allDone =
+            model.rows
+                |> List.filter (\r -> r.halfHours > 0)
+                |> List.all .isDone
+
         viewRow index row =
             let
                 ( jira, title ) =
@@ -85,10 +90,10 @@ viewLoaded model =
                     "copy-" ++ (toString row.rowId)
 
                 rowClass =
-                    if index % 2 == 0 then
-                        ""
-                    else
+                    if row.isDone then
                         "pure-table-odd"
+                    else
+                        ""
             in
                 tr [ class rowClass ]
                     [ td [ id clipboardId ] [ makeLinkIfStartOfTitleLooksLikeJiraIdentifier jira ]
@@ -112,7 +117,13 @@ viewLoaded model =
                             ]
                             [ text "+" ]
                         ]
-                    , td [] [ input [ type_ "checkbox" ] [] ]
+                    , td []
+                        [ input
+                            [ onClick (ToggleIsDone row.rowId)
+                            , type_ "checkbox"
+                            ]
+                            []
+                        ]
                     ]
 
         footer =
@@ -129,18 +140,25 @@ viewLoaded model =
                         , th [] []
                         , th [ class "total-half-hours" ] [ "Total: " ++ totalHalfHours |> text ]
                         , th [] []
-                        , th [] []
+                        , th []
+                            [ if allDone then
+                                (text "🌈")
+                              else
+                                text ""
+                            ]
                         ]
     in
-        table [ class "pure-table" ]
-            [ thead [] [ header ]
-            , tbody []
-                (model.rows
-                    |> List.sortBy .totalDurationInMilliseconds
-                    |> List.reverse
-                    |> List.indexedMap viewRow
-                )
-            , tfoot [] [ footer ]
+        div []
+            [ table [ class "pure-table" ]
+                [ thead [] [ header ]
+                , tbody []
+                    (model.rows
+                        |> List.sortBy .totalDurationInMilliseconds
+                        |> List.reverse
+                        |> List.indexedMap viewRow
+                    )
+                , tfoot [] [ footer ]
+                ]
             ]
 
 

@@ -33,6 +33,7 @@ type alias SummaryRow =
     , title : String
     , totalDurationInMilliseconds : Int
     , halfHours : Int
+    , isDone : Bool
     }
 
 
@@ -57,3 +58,4 @@ type Msg
     | AddHalfHour RowId
     | SubtractHalfHour RowId
     | AddDays Int
+    | ToggleIsDone RowId
