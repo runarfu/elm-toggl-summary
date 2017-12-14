@@ -1,10 +1,10 @@
 module Main exposing (main)
 
+import Date
 import Html
+import State exposing (update)
 import Task
 import Time
-import Date
-import State exposing (update)
 import Types exposing (Model, Msg)
 import Views exposing (view)
 

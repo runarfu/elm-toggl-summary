@@ -1,11 +1,11 @@
 module State exposing (update)
 
 import Date exposing (Date)
-import Http
 import Date.Extra.Period exposing (add)
+import Http
 import Set
-import Types exposing (..)
 import Toggl exposing (..)
+import Types exposing (..)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -29,7 +29,7 @@ update msg model =
             { model | rows = changeDurationForId model.rows rowId 1 } ! []
 
         SubtractHalfHour rowId ->
-            { model | rows = changeDurationForId model.rows rowId (-1) } ! []
+            { model | rows = changeDurationForId model.rows rowId -1 } ! []
 
         AddDays days ->
             addDaysAndSendNewRequest model days
@@ -50,7 +50,7 @@ addDaysAndSendNewRequest model days =
             model.date
                 |> add Date.Extra.Period.Day days
     in
-        ( { model | date = newDate, state = NotLoaded }, getTogglEntries newDate )
+    ( { model | date = newDate, state = NotLoaded }, getTogglEntries newDate )
 
 
 getTogglEntries : Date -> Cmd Msg
@@ -95,13 +95,14 @@ collapseEntriesWithSameTitle togglEntries =
                     |> List.filter ((==) title << .title)
                     |> List.map .durationInMilliseconds
                     |> List.sum
-                    |> \totalDurationInMilliseconds ->
-                        { rowId = index
-                        , title = title
-                        , totalDurationInMilliseconds = totalDurationInMilliseconds
-                        , halfHours = roundMillisecondsToNearestHalfHours totalDurationInMilliseconds
-                        , isDone = False
-                        }
+                    |> (\totalDurationInMilliseconds ->
+                            { rowId = index
+                            , title = title
+                            , totalDurationInMilliseconds = totalDurationInMilliseconds
+                            , halfHours = roundMillisecondsToNearestHalfHours totalDurationInMilliseconds
+                            , isDone = False
+                            }
+                       )
             )
 
 
@@ -109,7 +110,7 @@ roundMillisecondsToNearestHalfHours : Int -> Int
 roundMillisecondsToNearestHalfHours ms =
     let
         halfHours =
-            (toFloat ms) / 1800000
+            toFloat ms / 1800000
 
         upperLimit =
             ceiling halfHours
@@ -117,7 +118,7 @@ roundMillisecondsToNearestHalfHours ms =
         lowerLimit =
             floor halfHours
     in
-        if ((toFloat upperLimit) - halfHours < halfHours - (toFloat lowerLimit)) then
-            upperLimit
-        else
-            lowerLimit
+    if toFloat upperLimit - halfHours < halfHours - toFloat lowerLimit then
+        upperLimit
+    else
+        lowerLimit
