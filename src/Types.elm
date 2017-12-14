@@ -1,8 +1,8 @@
 module Types exposing (..)
 
+import Date exposing (Date)
 import Http
 import Time exposing (Time)
-import Date exposing (Date)
 
 
 type alias Model =

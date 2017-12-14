@@ -1,13 +1,13 @@
 module Toggl exposing (getTogglEntriesRequest)
 
-import Date exposing (Date)
 import Base64
-import Json.Decode as Decode
-import Strftime
-import Http
-import QueryString exposing (add)
-import Types exposing (..)
 import Config exposing (myTogglCredentials)
+import Date exposing (Date)
+import Http
+import Json.Decode as Decode
+import QueryString exposing (add)
+import Strftime
+import Types exposing (..)
 
 
 getTogglEntriesRequest : Date -> Http.Request (List TogglEntry)
@@ -24,17 +24,17 @@ getTogglEntriesRequest date =
                 |> add "until" dateString
                 |> QueryString.render
     in
-        Http.request
-            { method = "GET"
-            , headers =
-                [ basicAuthHeader myTogglCredentials.apiToken "api_token" ]
-            , url =
-                "https://toggl.com/reports/api/v2/details/" ++ query
-            , body = Http.emptyBody
-            , expect = Http.expectJson entries
-            , timeout = Nothing
-            , withCredentials = False
-            }
+    Http.request
+        { method = "GET"
+        , headers =
+            [ basicAuthHeader myTogglCredentials.apiToken "api_token" ]
+        , url =
+            "https://toggl.com/reports/api/v2/details/" ++ query
+        , body = Http.emptyBody
+        , expect = Http.expectJson entries
+        , timeout = Nothing
+        , withCredentials = False
+        }
 
 
 basicAuthHeader : String -> String -> Http.Header
@@ -46,7 +46,7 @@ basicAuthHeader username password =
                 ++ password
                 |> Base64.encode
     in
-        Http.header "Authorization" ("Basic " ++ base64EncodedValue)
+    Http.header "Authorization" ("Basic " ++ base64EncodedValue)
 
 
 date : Decode.Decoder Date
@@ -61,7 +61,7 @@ date =
                 Err error ->
                     Decode.fail error
     in
-        Decode.string |> Decode.andThen convert
+    Decode.string |> Decode.andThen convert
 
 
 entry : Decode.Decoder TogglEntry

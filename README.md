@@ -7,7 +7,7 @@ You need to create a file `src/Config.elm` with your personal data for connectin
 with Toggl:
 
 ```elm
-module Config exposing (myTogglCredentials, jiraUrl)
+module Config exposing (myTogglCredentials, createURLFromTitle)
 
 import Types exposing (TogglCredentials)
 
@@ -19,10 +19,11 @@ myTogglCredentials =
     , apiToken = "..."
     }
 
+createURLFromTitle : String -> Maybe { url : String, linkText : String }
+createURLFromTitle title =
+  Nothing
+  -- Just {url = "https://some-issue-tracker/issues/" ++ issue, linkText = "Issue " ++ issue})
 
-jiraUrl : String
-jiraUrl =
-    "" -- The prefix of the Jira system you use (or leave it blank)
 ```
 
 # Install
